@@ -30,9 +30,9 @@ import flagImage from '../assets/flag.png';
 import {DimensionContext} from '../../App';
 
 const MainGame = () => {
-  const [AmountBoom, setAmountBoom] = useState(10);
   const [loading, setLoading] = useState(false);
   const {dimension, setPositionRecentlyClick} = useContext(DimensionContext);
+  const AmountBoom = useMemo(() => dimension * 2 - 5, [dimension]);
   const matrixInit = useMemo(() => {
     let mt = [];
     for (let i = 0; i < dimension; i++) {
@@ -88,7 +88,6 @@ const MainGame = () => {
     [dimension, AmountBoom],
   );
   useEffect(() => {
-    setAmountBoom(dimension * 2 - 5);
     playAgain();
   }, [dimension]);
   const handleClick = (x, y) => {
@@ -156,6 +155,7 @@ const MainGame = () => {
     });
     setOpen(JSON.parse(JSON.stringify(matrixInit)));
     setFlag(false);
+    console.log(boom.length);
   };
 
   return (

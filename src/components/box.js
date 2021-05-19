@@ -29,7 +29,7 @@ const Box = ({index, open, value, handleClick}) => {
     if (open === 1) {
       setTimeout(() => {
         setActive(true);
-      }, Math.max(Math.abs(index.x - positionRecentlyClick.x), Math.abs(index.y - positionRecentlyClick.y)) * 100);
+      }, Math.max(Math.abs(index.x - positionRecentlyClick.x), Math.abs(index.y - positionRecentlyClick.y)) * 50);
       Animated.timing(fadeAnim2, {
         toValue: 1,
         duration: 500,
@@ -37,7 +37,7 @@ const Box = ({index, open, value, handleClick}) => {
           Math.max(
             Math.abs(index.x - positionRecentlyClick.x),
             Math.abs(index.y - positionRecentlyClick.y),
-          ) * 100,
+          ) * 50,
         useNativeDriver: true,
       }).start();
     }
