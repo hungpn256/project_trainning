@@ -1,10 +1,22 @@
+import AsyncStorage from '@react-native-community/async-storage';
 import {Picker} from '@react-native-picker/picker';
-import React, {useContext} from 'react';
+import React, {useContext, useEffect} from 'react';
 import {Dimensions, Pressable, StyleSheet, Text, View} from 'react-native';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {DimensionContext} from '../../../App';
+import * as minesweepernAction from '../../actions/minesweeper';
 const GameStart = ({navigation}) => {
   const {dimension, setDimension} = useContext(DimensionContext);
+  const dispatch = useDispatch();
+  useEffect(() => {
+    async function getScore() {
+      await AsyncStorage.getItem('score').then(res => {
+        console.log(JSON.parse(res), 'res');
+        dispatch(minesweepernAction.getPoint(JSON.parse(res)));
+      });
+    }
+    getScore();
+  }, []);
   return (
     <View style={styles.background}>
       <View>
@@ -31,7 +43,7 @@ const GameStart = ({navigation}) => {
           style={styles.btnStartGame}
           activeOpacity={0.8}
           onPress={() => {
-            navigation.navigate('Game');
+            navigation.navigate('HighScore');
           }}>
           <Text style={styles.btnText}>High score</Text>
         </Pressable>

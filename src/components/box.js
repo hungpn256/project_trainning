@@ -13,9 +13,8 @@ import {DimensionContext} from '../../App';
 import {useEffect, useState} from 'react';
 
 const Box = ({index, open, value, handleClick}) => {
-  console.log('render', index);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
-  const fadeAnim2 = React.useRef(new Animated.Value(0)).current;
+  const fadeAnim2 = React.useRef(new Animated.Value(0.2)).current;
   const [active, setActive] = useState(false);
   const {dimension, positionRecentlyClick} = React.useContext(DimensionContext);
   const fadeIn = () => {
@@ -28,12 +27,9 @@ const Box = ({index, open, value, handleClick}) => {
   };
   useEffect(() => {
     if (open === 1) {
-      setTimeout(() => {
-        setActive(true);
-      }, Math.max(Math.abs(index.x - positionRecentlyClick.x), Math.abs(index.y - positionRecentlyClick.y)) * 50);
       Animated.timing(fadeAnim2, {
         toValue: 1,
-        duration: 500,
+        duration: 10,
         delay:
           Math.max(
             Math.abs(index.x - positionRecentlyClick.x),
@@ -54,6 +50,7 @@ const Box = ({index, open, value, handleClick}) => {
         {flex: 1},
         {
           opacity: fadeAnim,
+          transform: [{scale: fadeAnim}],
         },
       ]}>
       <TouchableOpacity
@@ -63,7 +60,7 @@ const Box = ({index, open, value, handleClick}) => {
             handleClick(index.x, index.y);
           }
         }}
-        style={[styles.box, active && styles.active]}>
+        style={[styles.box, open === 1 && styles.active]}>
         {open === 1 ? (
           <Animated.View
             style={[

@@ -9,6 +9,7 @@ import Login from './src/screens/Login';
 import MainGame from './src/screens/Main';
 import rootReduer from './src/reducers/index';
 import {Provider} from 'react-redux';
+import HighScore from './src/screens/HighScore';
 export const DimensionContext = React.createContext();
 const store = createStore(
   rootReduer,
@@ -35,6 +36,7 @@ const App = () => {
           <Stack.Navigator>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="MenuGame" component={MenuGame} />
+            <Stack.Screen name="HighScore" component={HighScore} />
             <Stack.Screen name="StartGame" component={GameStart} />
             <Stack.Screen name="Game" component={MainGame} />
           </Stack.Navigator>

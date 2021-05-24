@@ -33,33 +33,51 @@ import {useDispatch, useSelector} from 'react-redux';
 import * as minesweeperActions from '../actions/minesweeper';
 import AsyncStorage from '@react-native-community/async-storage';
 
+const matrixInit = dimension => {
+  let mt = [];
+  for (let i = 0; i < dimension; i++) {
+    let row = [];
+    for (let j = 0; j < dimension; j++) {
+      row.push(0);
+    }
+    mt.push(row);
+  }
+  return mt;
+};
+
+const randomBoom = (array, dimension) => {
+  const x = Math.floor(Math.random() * dimension);
+  const y = Math.floor(Math.random() * dimension);
+  const index = _.findIndex(array, function (o) {
+    return o.x === x && o.y === y;
+  });
+  if (index === -1) {
+    array.push({x, y});
+    return [...array];
+  } else {
+    return randomBoom(array, dimension);
+  }
+};
+
+const AmountBoom = dimension => dimension * 2 - 5;
+
 const MainGame = () => {
   const [loading, setLoading] = useState(false);
-  const {dimension, setPositionRecentlyClick} = useContext(DimensionContext);
-  const AmountBoom = useMemo(() => dimension * 2 - 5, [dimension]);
-  const matrixInit = useMemo(() => {
-    let mt = [];
-    for (let i = 0; i < dimension; i++) {
-      let row = [];
-      for (let j = 0; j < dimension; j++) {
-        row.push(0);
-      }
-      mt.push(row);
-    }
-    return mt;
-  }, [dimension]);
+  const {dimension, setPositionRecentlyClick, positionRecentlyClick} =
+    useContext(DimensionContext);
 
-  const [matrix, setMatrix] = useState(JSON.parse(JSON.stringify(matrixInit)));
-  const [open, setOpen] = useState(JSON.parse(JSON.stringify(matrixInit)));
+  const [matrix, setMatrix] = useState(
+    JSON.parse(JSON.stringify(matrixInit(dimension))),
+  );
+  const [open, setOpen] = useState(
+    JSON.parse(JSON.stringify(matrixInit(dimension))),
+  );
   const [boxOpenedNumber, setBoxOpenedNumber] = useState(0);
   const [flag, setFlag] = useState(false);
   const [isWin, setIsWin] = useState(0);
   const dispatch = useDispatch();
   const auth = useSelector(state => state.auth);
-  console.log(auth, 'auth');
   const score = useSelector(state => state.minesweeper.score);
-  console.log(score, 'sc');
-  let boom = [];
 
   function openBox(arrayOpen, x, y, dimensionsMatrix, arrayValue) {
     if (arrayOpen[x][y] === 0) {
@@ -82,70 +100,57 @@ const MainGame = () => {
       }
     }
   }
-
-  const randomBoom = useCallback(
-    (array, dimension) => {
-      const x = Math.floor(Math.random() * dimension);
-      const y = Math.floor(Math.random() * dimension);
-      const index = _.findIndex(array, function (o) {
-        return o.x === x && o.y === y;
-      });
-      if (index === -1) {
-        array.push({x, y});
-        return [...array];
-      } else {
-        return randomBoom(array, dimension);
-      }
-    },
-    [dimension, AmountBoom],
-  );
-
   useEffect(() => {
     playAgain();
   }, [dimension]);
 
   useEffect(() => {
-    return async () => {
-      await AsyncStorage.setItem('score', JSON.stringify(score));
-    };
-  }, []);
-
+    if (isWin === 1) {
+      AsyncStorage.setItem('score', JSON.stringify(score));
+    }
+  }, [score]);
   useEffect(() => {
-    if (boxOpenedNumber >= dimension * dimension - AmountBoom) {
+    if (matrix[positionRecentlyClick.x][positionRecentlyClick.y] === -1) {
+      let tmp = [...open];
+      tmp.forEach(item => {
+        item.fill(1);
+      });
+      setOpen(tmp);
+      setIsWin(-1);
+    }
+  }, [positionRecentlyClick.x, positionRecentlyClick.y]);
+  useEffect(() => {
+    if (boxOpenedNumber >= dimension * dimension - AmountBoom(dimension)) {
       setIsWin(1);
       dispatch(
         minesweeperActions.addPoint({
           username: auth.username,
-          score: new Date(),
         }),
       );
     }
   }, [boxOpenedNumber]);
 
-  const handleClick = (x, y) => {
-    let tmp = [...open];
-    if (!flag) {
-      openBox(tmp, x, y, dimension, matrix);
-      setPositionRecentlyClick({x, y});
-      setOpen(tmp);
-      if (matrix[x][y] === -1) {
-        tmp.forEach(item => {
-          item.fill(1);
-        });
+  const handleClick = useCallback(
+    (x, y) => {
+      var t0 = performance.now();
+      let tmp = [...open];
+      if (!flag) {
+        openBox(tmp, x, y, dimension, matrix);
         setOpen(tmp);
-        setIsWin(-1);
-      }
-    } else {
-      if (tmp[x][y] === 0) {
-        tmp[x][y] = 2;
-        console.log('a');
+        setPositionRecentlyClick({x, y});
       } else {
-        console.log('s');
-        tmp[x][y] = 0;
+        if (tmp[x][y] === 0) {
+          tmp[x][y] = 2;
+        } else {
+          tmp[x][y] = 0;
+        }
+        setOpen(tmp);
       }
-      setOpen(tmp);
-    }
-  };
+      var t1 = performance.now();
+      console.log('Call to doWork took ' + (t1 - t0) + ' milliseconds.');
+    },
+    [flag, open],
+  );
 
   useEffect(() => {
     if (loading) {
@@ -159,8 +164,9 @@ const MainGame = () => {
     setLoading(true);
     setIsWin(0);
     setBoxOpenedNumber(0);
-    setMatrix(JSON.parse(JSON.stringify(matrixInit)));
-    for (let i = 0; i < AmountBoom; i++) {
+    setMatrix(JSON.parse(JSON.stringify(matrixInit(dimension))));
+    let boom = [];
+    for (let i = 0; i < AmountBoom(dimension); i++) {
       randomBoom(boom, dimension);
     }
     setMatrix(mt => {
@@ -185,7 +191,7 @@ const MainGame = () => {
       });
       return tmp;
     });
-    setOpen(JSON.parse(JSON.stringify(matrixInit)));
+    setOpen(JSON.parse(JSON.stringify(matrixInit(dimension))));
     setFlag(false);
   };
 
@@ -197,7 +203,7 @@ const MainGame = () => {
         </View>
       ) : (
         <View>
-          <CountTime />
+          <CountTime isWin={isWin} />
           <View style={styles(dimension).mainGame}>
             {matrix.map((item, index) => {
               return item.map((subItem, subIndex) => {
@@ -237,25 +243,6 @@ const MainGame = () => {
               activeOpacity={0.8}
               onPress={() => {
                 setFlag(true);
-              }}>
-              <Image
-                source={flagImage}
-                style={[
-                  styles(dimension).imageOption,
-                  flag && styles(dimension).imageSelect,
-                ]}
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => {
-                // console.log(auth.username);
-                dispatch(
-                  minesweeperActions.addPoint({
-                    username: auth.username,
-                    score: 123,
-                  }),
-                );
               }}>
               <Image
                 source={flagImage}
