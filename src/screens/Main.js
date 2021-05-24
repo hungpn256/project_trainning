@@ -29,6 +29,9 @@ import cuoc from '../assets/cuoc.png';
 import flagImage from '../assets/flag.png';
 import {DimensionContext} from '../../App';
 import CountTime from '../components/CountTime';
+import {useDispatch, useSelector} from 'react-redux';
+import * as minesweeperActions from '../actions/minesweeper';
+import AsyncStorage from '@react-native-community/async-storage';
 
 const MainGame = () => {
   const [loading, setLoading] = useState(false);
@@ -45,12 +48,19 @@ const MainGame = () => {
     }
     return mt;
   }, [dimension]);
+
   const [matrix, setMatrix] = useState(JSON.parse(JSON.stringify(matrixInit)));
   const [open, setOpen] = useState(JSON.parse(JSON.stringify(matrixInit)));
   const [boxOpenedNumber, setBoxOpenedNumber] = useState(0);
   const [flag, setFlag] = useState(false);
   const [isWin, setIsWin] = useState(0);
+  const dispatch = useDispatch();
+  const auth = useSelector(state => state.auth);
+  console.log(auth, 'auth');
+  const score = useSelector(state => state.minesweeper.score);
+  console.log(score, 'sc');
   let boom = [];
+
   function openBox(arrayOpen, x, y, dimensionsMatrix, arrayValue) {
     if (arrayOpen[x][y] === 0) {
       arrayOpen[x][y] = 1;
@@ -72,6 +82,7 @@ const MainGame = () => {
       }
     }
   }
+
   const randomBoom = useCallback(
     (array, dimension) => {
       const x = Math.floor(Math.random() * dimension);
@@ -88,14 +99,30 @@ const MainGame = () => {
     },
     [dimension, AmountBoom],
   );
+
   useEffect(() => {
     playAgain();
   }, [dimension]);
+
   useEffect(() => {
-    console.log(flag);
-  }, [flag]);
+    return async () => {
+      await AsyncStorage.setItem('score', JSON.stringify(score));
+    };
+  }, []);
+
+  useEffect(() => {
+    if (boxOpenedNumber >= dimension * dimension - AmountBoom) {
+      setIsWin(1);
+      dispatch(
+        minesweeperActions.addPoint({
+          username: auth.username,
+          score: new Date(),
+        }),
+      );
+    }
+  }, [boxOpenedNumber]);
+
   const handleClick = (x, y) => {
-    console.log(flag, ' ss');
     let tmp = [...open];
     if (!flag) {
       openBox(tmp, x, y, dimension, matrix);
@@ -107,10 +134,6 @@ const MainGame = () => {
         });
         setOpen(tmp);
         setIsWin(-1);
-      } else {
-        if (boxOpenedNumber > dimension * dimension - AmountBoom) {
-          setIsWin(1);
-        }
       }
     } else {
       if (tmp[x][y] === 0) {
@@ -123,6 +146,7 @@ const MainGame = () => {
       setOpen(tmp);
     }
   };
+
   useEffect(() => {
     if (loading) {
       setTimeout(() => {
@@ -130,6 +154,7 @@ const MainGame = () => {
       }, 1000);
     }
   }, [loading]);
+
   const playAgain = () => {
     setLoading(true);
     setIsWin(0);
@@ -162,7 +187,6 @@ const MainGame = () => {
     });
     setOpen(JSON.parse(JSON.stringify(matrixInit)));
     setFlag(false);
-    console.log(boom.length);
   };
 
   return (
@@ -213,6 +237,25 @@ const MainGame = () => {
               activeOpacity={0.8}
               onPress={() => {
                 setFlag(true);
+              }}>
+              <Image
+                source={flagImage}
+                style={[
+                  styles(dimension).imageOption,
+                  flag && styles(dimension).imageSelect,
+                ]}
+              />
+            </TouchableOpacity>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => {
+                // console.log(auth.username);
+                dispatch(
+                  minesweeperActions.addPoint({
+                    username: auth.username,
+                    score: 123,
+                  }),
+                );
               }}>
               <Image
                 source={flagImage}
