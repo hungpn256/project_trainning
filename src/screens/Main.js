@@ -28,6 +28,7 @@ import Box from '../components/box';
 import cuoc from '../assets/cuoc.png';
 import flagImage from '../assets/flag.png';
 import {DimensionContext} from '../../App';
+import CountTime from '../components/CountTime';
 
 const MainGame = () => {
   const [loading, setLoading] = useState(false);
@@ -90,7 +91,11 @@ const MainGame = () => {
   useEffect(() => {
     playAgain();
   }, [dimension]);
+  useEffect(() => {
+    console.log(flag);
+  }, [flag]);
   const handleClick = (x, y) => {
+    console.log(flag, ' ss');
     let tmp = [...open];
     if (!flag) {
       openBox(tmp, x, y, dimension, matrix);
@@ -110,7 +115,9 @@ const MainGame = () => {
     } else {
       if (tmp[x][y] === 0) {
         tmp[x][y] = 2;
+        console.log('a');
       } else {
+        console.log('s');
         tmp[x][y] = 0;
       }
       setOpen(tmp);
@@ -166,6 +173,7 @@ const MainGame = () => {
         </View>
       ) : (
         <View>
+          <CountTime />
           <View style={styles(dimension).mainGame}>
             {matrix.map((item, index) => {
               return item.map((subItem, subIndex) => {

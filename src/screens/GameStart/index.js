@@ -16,7 +16,6 @@ const GameStart = ({navigation}) => {
   const {dimension, setDimension} = useContext(DimensionContext);
   return (
     <View style={styles.background}>
-      {/* <Image source={boom} style={{display: 'none'}} /> */}
       <Text style={styles.title}>Select dimension:</Text>
       <Picker
         selectedValue={dimension}

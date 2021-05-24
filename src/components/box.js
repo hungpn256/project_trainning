@@ -13,6 +13,7 @@ import {DimensionContext} from '../../App';
 import {useEffect, useState} from 'react';
 
 const Box = ({index, open, value, handleClick}) => {
+  console.log('render', index);
   const fadeAnim = React.useRef(new Animated.Value(0)).current;
   const fadeAnim2 = React.useRef(new Animated.Value(0)).current;
   const [active, setActive] = useState(false);
@@ -52,7 +53,6 @@ const Box = ({index, open, value, handleClick}) => {
       style={[
         {flex: 1},
         {
-          // Bind opacity to animated value
           opacity: fadeAnim,
         },
       ]}>
@@ -115,4 +115,10 @@ const styles = StyleSheet.create({
     textAlignVertical: 'center',
   },
 });
-export default React.memo(Box);
+export default React.memo(Box, (prev, next) => {
+  return (
+    prev.open === next.open &&
+    prev.value === next.value &&
+    prev.handleClick === next.handleClick
+  );
+});
