@@ -1,41 +1,41 @@
-import React from 'react';
 import {Picker} from '@react-native-picker/picker';
-import {
-  Text,
-  TouchableOpacity,
-  View,
-  StyleSheet,
-  Dimensions,
-  Pressable,
-  Image,
-} from 'react-native';
+import React, {useContext} from 'react';
+import {Dimensions, Pressable, StyleSheet, Text, View} from 'react-native';
+import {useSelector} from 'react-redux';
 import {DimensionContext} from '../../../App';
-import {useContext} from 'react';
-import boom from '../../assets/boom.png';
 const GameStart = ({navigation}) => {
   const {dimension, setDimension} = useContext(DimensionContext);
   return (
     <View style={styles.background}>
-      {/* <Image source={boom} style={{display: 'none'}} /> */}
-      <Text style={styles.title}>Select dimension:</Text>
-      <Picker
-        selectedValue={dimension}
-        style={styles.picker}
-        onValueChange={(itemValue, itemIndex) => {
-          setDimension(itemValue);
-        }}>
-        <Picker.Item label="5x5" value={5} />
-        <Picker.Item label="9x9" value={9} />
-        <Picker.Item label="16x16" value={16} />
-      </Picker>
-      <Pressable
-        style={styles.btnStartGame}
-        activeOpacity={0.8}
-        onPress={() => {
-          navigation.navigate('Game');
-        }}>
-        <Text style={styles.btnText}>Start Game</Text>
-      </Pressable>
+      <View>
+        <Text style={styles.title}>Select dimension:</Text>
+        <Picker
+          selectedValue={dimension}
+          style={styles.picker}
+          onValueChange={(itemValue, itemIndex) => {
+            setDimension(itemValue);
+          }}>
+          <Picker.Item label="5x5" value={5} />
+          <Picker.Item label="9x9" value={9} />
+          <Picker.Item label="16x16" value={16} />
+        </Picker>
+        <Pressable
+          style={styles.btnStartGame}
+          activeOpacity={0.8}
+          onPress={() => {
+            navigation.navigate('Game');
+          }}>
+          <Text style={styles.btnText}>Start Game</Text>
+        </Pressable>
+        <Pressable
+          style={styles.btnStartGame}
+          activeOpacity={0.8}
+          onPress={() => {
+            navigation.navigate('Game');
+          }}>
+          <Text style={styles.btnText}>High score</Text>
+        </Pressable>
+      </View>
     </View>
   );
 };
@@ -63,7 +63,6 @@ const styles = StyleSheet.create({
     minWidth: 150,
     borderRadius: 10,
     marginTop: 20,
-    marginBottom: 100,
   },
   btnText: {
     color: '#fff',
