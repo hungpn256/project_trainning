@@ -29,7 +29,7 @@ const Login = ({navigation}) => {
           uri: 'https://wallup.net/wp-content/uploads/2018/03/19/580133-portrait_display-vertical-pattern-digital_art-748x1330.jpg',
         }}>
         <View style={styles.container}>
-          <Text style={styles.textHeader}>Let's sign you in.</Text>
+          <Text style={styles.textHeader}>Let's ssssign you in.</Text>
           <Text style={styles.text}>Welcome back.</Text>
           <Text style={styles.text}>You've been missed!</Text>
           <View style={styles.formInput}>
