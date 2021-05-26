@@ -30,7 +30,7 @@ const GameStart = ({navigation}) => {
             style={styles.btnStartGame}
             activeOpacity={0.8}
             onPress={() => {
-              navigation.navigate('StartGame');
+              navigation.navigate('PayRoll');
             }}>
             <Image source={minesweeper} style={styles.image} />
           </TouchableOpacity>

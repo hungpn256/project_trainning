@@ -1,15 +1,15 @@
 import {NavigationContainer} from '@react-navigation/native';
 import {createStackNavigator} from '@react-navigation/stack';
 import React, {useState} from 'react';
-import {Text, View} from 'react-native';
+import {Provider} from 'react-redux';
 import {createStore} from 'redux';
+import rootReduer from './src/reducers/index';
 import GameStart from './src/screens/GameStart';
-import MenuGame from './src/screens/MenuGame';
+import HighScore from './src/screens/HighScore';
 import Login from './src/screens/Login';
 import MainGame from './src/screens/Main';
-import rootReduer from './src/reducers/index';
-import {Provider} from 'react-redux';
-import HighScore from './src/screens/HighScore';
+import MenuGame from './src/screens/MenuGame';
+import PayRoll from './src/screens/PayRoll';
 export const DimensionContext = React.createContext();
 const store = createStore(
   rootReduer,
@@ -34,11 +34,16 @@ const App = () => {
         }}>
         <NavigationContainer>
           <Stack.Navigator>
-            <Stack.Screen name="Login" component={Login} />
+            <Stack.Screen
+              options={{headerShown: false}}
+              name="Login"
+              component={Login}
+            />
             <Stack.Screen name="MenuGame" component={MenuGame} />
             <Stack.Screen name="HighScore" component={HighScore} />
             <Stack.Screen name="StartGame" component={GameStart} />
             <Stack.Screen name="Game" component={MainGame} />
+            <Stack.Screen name="PayRoll" component={PayRoll} />
           </Stack.Navigator>
         </NavigationContainer>
       </DimensionContext.Provider>
